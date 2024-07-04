@@ -1,0 +1,11 @@
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Repositories/OrderItemRepository.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Controllers/OrderItemController.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Repositories/OrderRepository.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Models/OrderItem.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Models/Product.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/RemoteDesktopShopApplication.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Models/Order.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Controllers/BaseController.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Repositories/ProductRepository.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Controllers/ProductController.java
+/Users/raphealdabney/projects/teamviewer-desktop-shop/api/src/main/java/com/teamviewer/remotedesktopshop/RemoteDesktopShop/Controllers/ShopOrderController.java

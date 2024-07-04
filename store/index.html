@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>ToolRentalStore | POS</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#intro">Welcome</a></li>
+							<li><a href="#one">Products</a></li>
+							<li><a href="#two">My Cart</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Intro -->
+					<section id="intro" class="wrapper style1 fullscreen fade-up">
+						<div class="inner">
+							<h1>ToolRentalStore POS</h1>
+							<p>Reserve a remote desktop instance below to use your machine, anywhere. Just purchase one of the options and our team will get back with you.</p>
+							<ul class="actions">
+								<li><a href="#one" class="button scrolly">Learn more</a></li>
+							</ul>
+						</div>
+					</section>
+
+				<!-- One -->
+					<section id="one" class="wrapper style2 spotlights">
+
+					</section>
+
+				<!-- Two -->
+					<section id="two" class="wrapper style3 fade-up">
+						<div class="inner">
+							<h2>My Cart</h2>
+							<p>See items in your cart.</p>
+							<div class="features">
+
+
+							</div>
+							<ul class="actions">
+								<li><a href="#" class="button checkoutBtn">Checkout</a></li>
+							</ul>
+						</div>
+					</section>
+
+
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; ToolRentalStore. All rights reserved.</li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	<script type="text/javascript">
+		window.serverAddr = "http://localhost:8082";
+		$(document).on('click','.addToCartBtn', (e)=>{
+			e.preventDefault();
+			let productId = e.target?.dataset?.productId;
+			$.ajax({
+				url: window.serverAddr + "/order-items",
+				type:"POST",
+				data:JSON.stringify({
+					productId: productId,
+					quantity: 1,
+					orderId: 1
+				}),
+				contentType:"application/json; charset=utf-8",
+				dataType:"json",
+				success: function(d){
+					window.location.reload();
+				}
+			})
+		});
+		$(document).ready(function() {
+			window.products = [];
+			// Fetch products for display.
+			$.get(window.serverAddr + "/products/populate", function (prods) {
+				$.get(window.serverAddr + "/products", function (data) {
+					window.products = data;
+					data.forEach((datab) => {
+						$("section#one").append("<section>\n" +
+								"\t\t\t\t\t\t\t<a href=\"#\" class=\"image\"><img style='max-width: 100%' src=\"" + datab.imageUrl + "\" alt=\"\" data-position=\"center center\" /></a>\n" +
+								"\t\t\t\t\t\t\t<div class=\"content\">\n" +
+								"\t\t\t\t\t\t\t\t<div class=\"inner\">\n" +
+								"\t\t\t\t\t\t\t\t\t<h2>" + datab.name + "</h2>\n" +
+								"\t\t\t\t\t\t\t\t\t<p>" + datab.description + "</p>\n" +
+								"\t\t\t\t\t\t\t\t\t<ul class=\"actions\">\n" +
+								"\t\t\t\t\t\t\t\t\t\t<li><a href=\"#\" data-product-id='" + datab.id + "' class=\"button addToCartBtn\">+ add to cart</a></li>\n" +
+								"\t\t\t\t\t\t\t\t\t</ul>\n" +
+								"\t\t\t\t\t\t\t\t</div>\n" +
+								"\t\t\t\t\t\t\t</div>\n" +
+								"\t\t\t\t\t\t</section>");
+					})
+				});
+			});
+
+
+			// Check for orders order create one.
+			$.get(window.serverAddr + "/orders", function (orderData) {
+				let order = orderData.length > 0 ? orderData[0] : null;
+
+				if (!order) {
+					$.ajax({
+						url: window.serverAddr + "/orders",
+						type:"POST",
+						data:JSON.stringify({
+							token: "heythere"
+						}),
+						contentType:"application/json; charset=utf-8",
+						dataType:"json",
+						success: function(d){
+							console.log("created first order");
+						}
+					})
+				}
+			});
+
+			setTimeout(function() {
+				// Fetch orders for display.
+				$.get(window.serverAddr + "/orders", function (orderData) {
+					let order = orderData.length > 0 ? orderData[0] : null;
+
+					if (order) {
+						$.get(window.serverAddr+ "/order-items", function (data) {
+							data.forEach((datab) => {
+								let productName;
+								let product = window.products.find((p) => p.id == datab.productId);
+								if (product && datab.orderId == order.id) {
+									$("section#two .features").append("<section>\n" +
+											"\t\t\t\t\t\t\t\t\t<span class=\"icon solid major fa-code\"></span>\n" +
+											"\t\t\t\t\t\t\t\t\t<h3></h3>\n" +
+											"\t\t\t\t\t\t\t\t\t<p>" + "( " + datab.quantity + " ) " + product.name + " @ $" + product.price + "</p>\n" +
+											"\t\t\t\t\t\t\t\t</section>");
+								}
+							})
+						});
+					}
+				});
+			}, 2500);
+		});
+	</script>
+
+	</body>
+</html>
