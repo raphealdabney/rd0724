@@ -1,7 +1,6 @@
 package com.toolrentalstore.toolrentalpos.ToolRentalPos.services;
 
-import java.time.Instant;
-import java.util.Date;
+import java.util.Calendar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
@@ -20,11 +19,12 @@ class OrderServiceTests {
     @Test
     public void getChargableDaysForProductForDaysStarting() {
         // Integer id, String name, float charges_daily, Integer charges_weekday, Integer charges_weekend, Integer charges_holiday, String tool_code, String tool_type, String brand, String image
-        Product product = new Product(1, "test prod", 1.0f, 1,1,1,"JAKD", "jackhammer","dewalt", "");
+        Product product = new Product(1, "test prod", 1.0f, 1,1,0,"JAKD", "jackhammer","dewalt", "");
         int daysToRent = 4;
-        Date checkoutDate = Date.from(Instant.parse("2024-07-01T00:00:00.00Z"));
-        int chargableDays = orderService.getChargableDaysForProductForDaysStarting(product, daysToRent, checkoutDate);
-        assertEquals(5, chargableDays);
+        Calendar checkoutDate = Calendar.getInstance();
+        checkoutDate.set(2024,Calendar.JULY,1);
+        int chargableDays = orderService.getChargableDaysForProductForDaysStarting(product, daysToRent, checkoutDate.getTime());
+        assertEquals(3, chargableDays);
     }
 
 }

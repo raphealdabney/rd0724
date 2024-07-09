@@ -1,12 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.toolrentalstore.toolrentalpos.ToolRentalPos.services.OrderServiceTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.879 s <<< FAILURE! -- in com.toolrentalstore.toolrentalpos.ToolRentalPos.services.OrderServiceTests
-com.toolrentalstore.toolrentalpos.ToolRentalPos.services.OrderServiceTests.getChargableDaysForProductForDaysStarting -- Time elapsed: 0.673 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "java.io.Console.printf(String, Object[])" because the return value of "java.lang.System.console()" is null
-	at com.toolrentalstore.toolrentalpos.ToolRentalPos.Services.OrderService.getChargableDaysForProductForDaysStarting(OrderService.java:53)
-	at com.toolrentalstore.toolrentalpos.ToolRentalPos.services.OrderServiceTests.getChargableDaysForProductForDaysStarting(OrderServiceTests.java:26)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.046 s -- in com.toolrentalstore.toolrentalpos.ToolRentalPos.services.OrderServiceTests

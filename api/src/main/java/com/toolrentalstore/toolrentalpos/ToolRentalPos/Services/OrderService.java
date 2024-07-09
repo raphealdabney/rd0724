@@ -107,15 +107,18 @@ public class OrderService {
 
     public int getChargableDaysForProductForDaysStarting(Product product, int daysToRent, Date checkoutDate) {
         int chargableDays = 0;
+        Calendar initCal = Calendar.getInstance();
+        initCal.setTime(checkoutDate);
+        int initDate = initCal.get(Calendar.DATE);
         for(int i = 0; i < daysToRent; i++) {
             // Add one day until no more
             Calendar cal = Calendar.getInstance();
             cal.setTime(checkoutDate);
-            cal.add(Calendar.DATE, i);
+            cal.set(Calendar.DATE, i + initDate);
 
             boolean isCurrentDateAWeekday = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY; 
             boolean isCurrentDateAWeekEnd = !isCurrentDateAWeekday;
-            boolean isCurrentDateAHoliday = isDateOnAHoliday(checkoutDate);
+            boolean isCurrentDateAHoliday = isDateOnAHoliday(cal.getTime());
 
             boolean productChargableWeekDay =  product.getCharges_weekday() == 1 ? true : false;
             boolean productChargableWeekEnd =  product.getCharges_weekend() == 1 ? true : false;
@@ -126,7 +129,7 @@ public class OrderService {
             if (isCurrentDateAWeekday && !productChargableWeekDay) {
                 continue;
             }
-             
+
             // If it's a weekend & this product doesn't charge for weekends, move on.
             if (isCurrentDateAWeekEnd && !productChargableWeekEnd) {                
                 continue;
