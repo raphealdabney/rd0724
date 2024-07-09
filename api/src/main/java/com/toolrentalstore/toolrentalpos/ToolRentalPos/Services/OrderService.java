@@ -6,10 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Cart;
@@ -149,10 +147,12 @@ public class OrderService {
     }
 
     public Product findProductByCode(String tool_code) {
-        Product searcher = new Product();
-        searcher.setTool_code(tool_code);
-        Example<Product> productExample = Example.of(searcher);
-        Optional<Product> result = productRepository.findOne(productExample);
-        return result.isEmpty() ? null : result.get();
+       List<Product> products = productRepository.findAll();
+       for (Product prod : products) {
+            if (prod.getTool_code().equals(tool_code)) {
+                return prod;
+            }
+       }
+       return null;
     }
 }

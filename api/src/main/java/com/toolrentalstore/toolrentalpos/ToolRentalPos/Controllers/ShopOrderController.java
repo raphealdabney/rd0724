@@ -84,7 +84,6 @@ public class ShopOrderController implements BaseController {
     @PostMapping(value = "/orders/calc-cart-price") 
     @ResponseBody
     public double calculateCartTotal(@RequestBody Cart cart ) {   
-
         return orderService.calculateTotalForCart(cart);
     }
 
