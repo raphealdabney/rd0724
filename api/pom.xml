@@ -8,11 +8,11 @@
 		<version>3.2.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.teamviewer.remotedesktopshop</groupId>
-	<artifactId>RemoteDesktopShop</artifactId>
+	<groupId>com.toolrentalstore.toolrentalpos</groupId>
+	<artifactId>ToolRentalPos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>RemoteDesktopShop</name>
-	<description>Shop for Remote Desktops powered by team viewer.</description>
+	<name>ToolRentalPos</name>
+	<description>POS for ToolRental Store.</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

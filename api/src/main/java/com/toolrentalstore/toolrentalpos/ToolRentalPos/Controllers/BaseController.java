@@ -1,7 +1,7 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Controllers;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Controllers;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories.OrderItemRepository;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories.ProductRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderItemRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.ProductRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;

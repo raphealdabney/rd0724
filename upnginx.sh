@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-docker cp store/. teamviewer-remote-desktop-shop-frontend-1:/usr/share/nginx/html
+cd pos
+npm run build
+docker cp build/. tool-rental-pos-system-frontend-1:/usr/share/nginx/html
+cd ..

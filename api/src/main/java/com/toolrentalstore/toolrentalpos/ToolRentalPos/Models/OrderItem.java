@@ -1,20 +1,19 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Models;
 
 import jakarta.persistence.*;
 
 import java.sql.Date;
 
 @Entity
-@Table(name = "order_item")
+@Table(name = "shop_order_item")
 public class OrderItem {
 
-    public OrderItem(Integer id, Integer productId, Integer quantity, Integer orderId, String imageUrl, String price) {
+    public OrderItem(Integer id, String tool_code, Integer rental_day_count, Integer discount_percentage, Integer shop_order_id) {
         this.id = id;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.orderId = orderId;
-        this.imageUrl = imageUrl;
-        this.price = price;
+        this.tool_code = tool_code;
+        this.rental_day_count = rental_day_count;
+        this.discount_pertcentage = discount_percentage;
+        this.shop_order_id = shop_order_id;    
     }
 
     public OrderItem() {
@@ -25,63 +24,87 @@ public class OrderItem {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "product_id")
-    private Integer productId;
+    @Column(name = "tool_code")
+    private String tool_code;
 
-    @Column(name = "quantity")
-    private Integer quantity;
+    @Column(name = "rental_day_count")
+    private Integer rental_day_count;
 
-    @Column(name = "order_id")
-    private Integer orderId;
+    @Column(name = "discount_percentage")
+    private Integer discount_pertcentage;
 
-    private String imageUrl;
-    private String price;
+    @Column(name = "shop_order_id")
+    private Integer shop_order_id;
+    
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
+    /**
+     * @return Integer return the id
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public Integer getProductId() {
-        return productId;
+    /**
+     * @return String return the tool_code
+     */
+    public String getTool_code() {
+        return tool_code;
     }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
+    /**
+     * @param tool_code the tool_code to set
+     */
+    public void setTool_code(String tool_code) {
+        this.tool_code = tool_code;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    /**
+     * @return Integer return the rental_day_count
+     */
+    public Integer getRental_day_count() {
+        return rental_day_count;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    /**
+     * @param rental_day_count the rental_day_count to set
+     */
+    public void setRental_day_count(Integer rental_day_count) {
+        this.rental_day_count = rental_day_count;
     }
 
-    public Integer getOrderId() {
-        return orderId;
+    /**
+     * @return Integer return the discount_pertcentage
+     */
+    public Integer getDiscount_pertcentage() {
+        return discount_pertcentage;
     }
 
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
+    /**
+     * @param discount_pertcentage the discount_pertcentage to set
+     */
+    public void setDiscount_pertcentage(Integer discount_pertcentage) {
+        this.discount_pertcentage = discount_pertcentage;
     }
+
+    /**
+     * @return Integer return the shop_order_id
+     */
+    public Integer getShop_order_id() {
+        return shop_order_id;
+    }
+
+    /**
+     * @param shop_order_id the shop_order_id to set
+     */
+    public void setShop_order_id(Integer shop_order_id) {
+        this.shop_order_id = shop_order_id;
+    }
+
 }

@@ -1,6 +1,6 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.OrderItem;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.OrderItem;
 import org.springframework.data.repository.CrudRepository;
 
 public interface OrderItemRepository extends CrudRepository<OrderItem, Integer> {

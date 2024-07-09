@@ -1,4 +1,4 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Models;
 
 import jakarta.persistence.*;
 

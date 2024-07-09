@@ -1,6 +1,6 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.Order;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Order;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

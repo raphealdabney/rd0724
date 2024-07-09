@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: com.teamviewer.remotedesktopshop.RemoteDesktopShop.RemoteDes
+Main-Class: com.toolrentalstore.toolrentalpos.ToolRentalPos.RemoteDes
  ktopShopApplication
 

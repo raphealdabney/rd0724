@@ -1,7 +1,7 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Controllers;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Controllers;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.Product;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories.ProductRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Product;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.ProductRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -75,14 +75,6 @@ public class ProductController implements BaseController {
     @GetMapping(value = "/products/populate")
     public void populate() {
         List<Product> productList = (List<Product>) repository.findAll();
-        if (productList.size() == 0) {
-            productList = new ArrayList<>();
-            productList.add(new Product(null, "Windows Machine", 24.5f, "This is windows 11 based remote desktop.", "https://i.pcmag.com/imagery/reviews/00xBy0JjVybodfIwWxeGCkZ-1..v1679417407.jpg"));
-            productList.add(new Product(null, "Mac OS Machine", 30.5f, "This is mac os based remote desktop.", "https://images.unsplash.com/photo-1514826786317-59744fe2a548?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGFwcGxlJTIwbWFjfGVufDB8fDB8fHww"));
-            productList.add(new Product(null, "Ubuntu Machine", 15.5f, "This is ubuntu based remote desktop.", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd6yvCeIVbHXOcwzN9CzDKNKwykpZ_lYDR7PewI66L7upLMaALB9OUX45FTdprea-xlTc&usqp=CAU"));
-        }
-
-
-        repository.saveAll(productList);
+        
     }
 }

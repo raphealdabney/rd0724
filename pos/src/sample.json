@@ -1,0 +1,64 @@
+{
+    "products": [
+        {
+          "id": 1,
+          "name": "Chainsaw",
+          "charges": {
+             "daily": 1.49,
+             "weekday": true,
+             "weekend": false,
+             "holiday": true
+          },
+          "tool_code": "CHNS",
+          "tool_type": "chainsaw",
+          "brand": "stihl",
+          "image": "img/stihl-chainsaw.jpeg",
+          "options": null
+        },
+        {
+          "id": 2,
+          "name": "Ladder",
+          "charges": {
+             "daily": 1.49,
+             "weekday": true,
+             "weekend": false,
+             "holiday": true
+          },
+          "tool_code": "LADW",
+          "tool_type": "ladder",
+          "brand": "Werner",
+          "image": "img/werner-ladder.jpeg",
+          "options": null
+        },
+        {
+          "id": 3,
+          "name": "Dewalt Jackhammer",
+          "charges": {
+             "daily": 1.49,
+             "weekday": true,
+             "weekend": false,
+             "holiday": true
+          },
+          "tool_code": "JAKD",
+          "tool_type": "jackhammer",
+          "brand": "DeWalt",
+          "image": "img/dewalt-jackhammer.jpg",
+          "options": null
+        },
+        {
+          "id": 4,
+          "name": "Ridgid Jackhammer",
+          "charges": {
+             "daily": 1.49,
+             "weekday": true,
+             "weekend": false,
+             "holiday": true
+          },
+          "tool_code": "JAKR",
+          "tool_type": "jackhammer",
+          "brand": "Ridgid",
+          "image": "img/ridgid-jackhammer.jpg",
+          "options": null
+        }
+    ]
+}

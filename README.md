@@ -1,4 +1,4 @@
-# TeamViewer Remote Desktop Shop
+# ToolRental POS
 ## Installation Instructions
 1. download zip provided
 2. extract zip contents to a directory on local machine

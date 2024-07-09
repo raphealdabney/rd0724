@@ -1,8 +1,8 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Controllers;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Controllers;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.OrderItem;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.Product;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories.OrderItemRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.OrderItem;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Product;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderItemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;

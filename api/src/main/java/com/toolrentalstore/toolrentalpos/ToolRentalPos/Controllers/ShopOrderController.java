@@ -1,22 +1,31 @@
-package com.teamviewer.remotedesktopshop.RemoteDesktopShop.Controllers;
+package com.toolrentalstore.toolrentalpos.ToolRentalPos.Controllers;
 
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.Order;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Models.Product;
-import com.teamviewer.remotedesktopshop.RemoteDesktopShop.Repositories.OrderRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Cart;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Order;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Services.OrderService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
+@CrossOrigin
 @RestController
 public class ShopOrderController implements BaseController {
 
     private final OrderRepository repository;
+    @Autowired
+    private final OrderService orderService;
 
-    public ShopOrderController(OrderRepository repository) {
+    public ShopOrderController(OrderRepository repository, OrderService orderService) {
         this.repository = repository;
+        this.orderService = orderService;
     }
 
     @GetMapping("/orders")
@@ -37,9 +46,11 @@ public class ShopOrderController implements BaseController {
 
     @PostMapping(value = "/orders")
     @ResponseBody
-    public Order createOne(@RequestBody Order data) {
+    public Map<String, String> createOne(@RequestBody Cart cart) {
         try {
-            return repository.save(data);
+            Map<String, String> response = new HashMap<String,String>();
+            response.put("html","<h1>Data returned</h1>");
+            return response;
         } catch(Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Resource not created");
         }
@@ -68,6 +79,13 @@ public class ShopOrderController implements BaseController {
             repository.delete(order.get());
         }
         return null;
+    }
+
+    @PostMapping(value = "/orders/calc-cart-price") 
+    @ResponseBody
+    public Float calculateCartTotal(@RequestBody Cart cart ) {   
+
+        return orderService.calculateTotalForCart(cart);
     }
 
 }
