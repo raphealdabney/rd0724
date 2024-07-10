@@ -14,7 +14,7 @@ function App() {
    const [firstTime,setFirstTime] = useState(true);
    const [activeMenu,setActiveMenu] = useState('pos');
    const [loadingSampleData,setLoadingSampleData] = useState(false);
-   const [moneys,setMoneys] = useState([2000, 5000, 10000, 20000, 50000, 100000]);
+   const [moneys,setMoneys] = useState([1, 5, 10, 20, 50, 100]);
    const [products,setProducts] = useState([]);
    const [keyword,setKeyword] = useState("");
    const [cart,setCart] = useState([]);
@@ -428,7 +428,7 @@ function App() {
             <input
              type="text"
              className="bg-white rounded-3xl shadow text-lg full w-full h-16 py-4 pl-16 transition-shadow focus:shadow-2xl focus:outline-none"
-             placeholder="Cari menu ..."
+             placeholder="Search here ..."
              x-model="keyword"
             />
           </div>
