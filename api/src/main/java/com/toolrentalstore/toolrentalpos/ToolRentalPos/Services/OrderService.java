@@ -23,6 +23,9 @@ import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderItemRep
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderRepository;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.ProductRepository;
 
+/*
+ * Service that will handle business logic related with place / managing orders.s
+ */
 @Service
 public class OrderService {
 
@@ -33,6 +36,7 @@ public class OrderService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    // Constructor.
     @Autowired
     public OrderService(ProductRepository productRepository, OrderItemRepository orderItemRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
@@ -40,6 +44,11 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
+    /*
+     * Return list of hashmaps that will hold each holiday for a passed in year.
+     * Each day of the year deemed to be a holidy or related to a holiday has it's own entry.
+     * The day of the month, and the month are associated with each entry for comparison later.
+     */
     public List<Map<String,Integer>> getHolidaysForYear(int year) {
         List<Map<String,Integer>> holidays = new ArrayList<>();
         // July 4th, take the 4th 100% & if it's on a weekend, choose the closest day as well.
@@ -69,6 +78,9 @@ public class OrderService {
         return holidays;
     }
 
+    /*
+     * This utility method takes a month, day, and year and returns HashMap for convience and reuse.
+     */
     public Map<String,Integer> getHolidayStruct(int month, int day, int year) {
         Map<String,Integer> holidayStruct = new HashMap<>();
         holidayStruct.put("month", month);
@@ -77,6 +89,9 @@ public class OrderService {
         return holidayStruct;
     }
 
+    /*
+     * Method to check if a date object is a holiday or is related to a holiday.
+     */
     public boolean isDateOnAHoliday(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -91,6 +106,11 @@ public class OrderService {
         return false;
     }
 
+    /*
+     * Method to take a cart and calcuate the final cost for a combination of items.
+     * Takes into account multiple items with a differing amount of rental days specific to each product.
+     * Handles application of discounts as well.
+     */
     public double calculateTotalForCart(Cart cart) {
         double rentalFees = calculateRentalFeesForCart(cart);
         double discountAmount = rentalFees * (double) (cart.getDiscountPercent() / 100.0f);
@@ -101,12 +121,19 @@ public class OrderService {
         return rentalFees - discountAmount;
     }
 
+    /*
+     * Calculates the discount amount for a cart.
+     */
     public float calculateDiscountAmountForCart(Cart cart) {
         double rentalFees = calculateRentalFeesForCart(cart);
         double discountAmount = rentalFees * (double) (cart.getDiscountPercent() / 100.0f);
         return Math.round(discountAmount * 100) / 100;
     }
 
+    /*
+     * Calculate Rental fees only for a cart. No discount applied. 
+     * Cart can contain multiple products.
+     */
     public double calculateRentalFeesForCart(Cart cart) {
         double dailyChargesAggregate = 0;
 
@@ -121,7 +148,21 @@ public class OrderService {
         return dailyChargesAggregate;
     }
 
-    public List<String> validateCart(Cart cart) {
+    /*
+     * Utility method to provide a boolean for the cart validity.
+     */
+    public boolean isCartValid(Cart cart) {
+        try {
+            return validateCart(cart, false).isEmpty();
+        } catch(Exception e ) { 
+            return false;
+        }
+    }
+    
+    /*
+     * Method to validate the cart and ensure values are sanitized.
+     */
+    public List<String> validateCart(Cart cart, boolean throwExceptionOnFail) throws Exception {
         List<String> output = new ArrayList<>();
         List<String> running = new ArrayList<>();
         for (CartItem item : cart.getItems()) {
@@ -139,22 +180,36 @@ public class OrderService {
             output.add("Sorry, there has been an error.");
             output.addAll(running);
             running.clear();
+
+            if (throwExceptionOnFail) {
+                String errs = "";
+                for (String error : output) {
+                    errs.concat(error+"\n");
+                }
+                throw new Exception(errs);
+            }
         }
         return output;
     }
 
+    /*
+     * Method to process order, meaning to do the following:
+     * 1.) validate the cart contents.
+     * 2.) Persist the order data in the database.
+     * 3.) Generate a Rental Agreement Data object.
+     * 4.) Output the Rental Agreement to the console.
+     * 5.) Return the Rental Agreement formatted for the frontend React interface.
+     * @Throws Exception on invalid cart contents.
+     */
     public String processOrder(Cart cart) throws Exception {
         String output = "";
 
         // Validate Order.
-        List<String> errors = validateCart(cart);
+        List<String> errors = validateCart(cart, true);
         if (!errors.isEmpty()) {
-            String errs = "";
-            for (String error : errors) {
-                errs.concat(error+"\n");
-            }
-            throw new Exception(errs);
+            return "Errors occured while processing your order.";
         }
+        
 
         // Create Order from cart.
         Order order = orderRepository.save(new Order(cart.getCheckoutDate()));
@@ -178,23 +233,33 @@ public class OrderService {
         return output;
     }
 
+    /*
+     * Method to take the rental agreement and display the formatted version of the data to the console.
+     */
+    public String outputRentalAgreementToSys(RentalAgreement rentalAgreement) {
+        List<String> outputArray = new ArrayList<>();
+        
+        outputArray.add("-- Order #" + rentalAgreement.getOrderId() +  " Processed --");
+        outputArray.add("Tool Code: " + rentalAgreement.getToolCode());
+        outputArray.add("Tool Type: " + rentalAgreement.getToolType()); // ● Tool type - From tool info
+        outputArray.add("Tool brand: " + rentalAgreement.getToolBrand()); // ●  From tool info
+        outputArray.add("Rental days: " + rentalAgreement.getRentalDays()); // ●  Specified at checkout
+        outputArray.add("Check out date: " + formatDate(rentalAgreement.getCheckoutDate())); // ●  - Specified at checkout
+        outputArray.add("Due date: " + formatDate(rentalAgreement.getDueDate())); // ●  Calculated from checkout date and rental days.
+        outputArray.add("Daily rental char: " + formatCurrency(rentalAgreement.getDailyCharge())); // ●  - Amount per day, specified by the tool type.
+        outputArray.add("Charge days: " + rentalAgreement.getChargeDays()); // ●  Count of chargeable days, from day after checkout through and including due
+        outputArray.add("Pre-discount Charge : " + formatCurrency(rentalAgreement.getPreDiscountCharge())); // ● Pre-discount charge - Calculated as charge days X daily charge. Resulting total rounded half up
+        outputArray.add("Discount Percent: " + rentalAgreement.getDiscountPercent() + "%"); // ● Discount percent - Specified at checkout.
+        outputArray.add("Discount Amount: " + formatCurrency(rentalAgreement.getDiscountAmount())); // ● Discount amount - calculated from discount % and pre-discount charge. Resulting amount
+        outputArray.add("Final Charge: " + formatCurrency(rentalAgreement.getFinalCharge())); // ● Final charge - Calculated as pre-discount charge - discount amount.
 
-    public void outputRentalAgreementToSys(RentalAgreement rentalAgreement) {
-        System.out.println("-- Order #" + rentalAgreement.getOrderId() +  " Processed --");
-        System.out.println("Tool Code: " + rentalAgreement.getToolCode());
-        System.out.println("Tool Type: " + rentalAgreement.getToolType()); // ● Tool type - From tool info
-        System.out.println("Tool brand: " + rentalAgreement.getToolBrand()); // ●  From tool info
-        System.out.println("Rental days: " + rentalAgreement.getRentalDays()); // ●  Specified at checkout
-        System.out.println("Check out date: " + formatDate(rentalAgreement.getCheckoutDate())); // ●  - Specified at checkout
-        System.out.println("Due date: " + formatDate(rentalAgreement.getDueDate())); // ●  Calculated from checkout date and rental days.
-        System.out.println("Daily rental char: " + formatCurrency(rentalAgreement.getDailyCharge())); // ●  - Amount per day, specified by the tool type.
-        System.out.println("Charge days: " + rentalAgreement.getChargeDays()); // ●  Count of chargeable days, from day after checkout through and including due
-        System.out.println("Pre-discount Charge : " + formatCurrency(rentalAgreement.getPreDiscountCharge())); // ● Pre-discount charge - Calculated as charge days X daily charge. Resulting total rounded half up
-        System.out.println("Discount Percent: " + rentalAgreement.getDiscountPercent() + "%"); // ● Discount percent - Specified at checkout.
-        System.out.println("Discount Amount: " + formatCurrency(rentalAgreement.getDiscountAmount())); // ● Discount amount - calculated from discount % and pre-discount charge. Resulting amount
-        System.out.println("Final Charge: " + formatCurrency(rentalAgreement.getFinalCharge())); // ● Final charge - Calculated as pre-discount charge - discount amount.
+        outputArray.forEach(s->System.out.println(s));
+        return outputArray.stream().reduce("",(agg,i) -> agg + i + "\n");
     }
 
+    /*
+     * Method to format and return Receipt / HTML based feedback for the frontend.
+     */
     public String createRentalAgreementHTML(RentalAgreement rentalAgreement, Cart cart) {
         String output = "<div class=\"text-center\">\n" + //
                         "          <img src=\"assets/img/receipt-logo.png\" alt=\"Tool Rental POS\" class=\"mb-3 w-8 h-8 inline-block\">\n" + //
@@ -252,6 +317,9 @@ public class OrderService {
         return output;
     }
 
+    /*
+     * Method to calculate the amount of chargable days for a given product. Considering a start day, and number of days to reserve.
+     */
     public int getChargableDaysForProductForDaysStarting(Product product, int daysToRent, Date checkoutDate) {
         int chargableDays = 0;
         Calendar initCal = Calendar.getInstance();
@@ -295,6 +363,11 @@ public class OrderService {
         return chargableDays;
     }
 
+    /*
+     * Utility method to get a product by it's code instead of it's database ID.
+     * Current method isn't optimal. Given more time, I would optimize this to utilize a postgres 
+     * sql query to return the one correct row instead of fitlering through all with application logic.
+     */
     public Product findProductByCode(String tool_code) {
        List<Product> products = productRepository.findAll();
        for (Product prod : products) {
@@ -321,6 +394,9 @@ public class OrderService {
         return output;
     }
 
+    /*
+     * Utility method to format string list in comma separated list.
+     */
     public String formatStrList(Stream<String> stringList) {
         String output = stringList.reduce("", (codes, item) -> codes + (codes.length() > 0 ? ", " : "") + item);
         return output;

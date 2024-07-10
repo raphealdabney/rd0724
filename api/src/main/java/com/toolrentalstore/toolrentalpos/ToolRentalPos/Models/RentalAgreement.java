@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Services.OrderService;
 
+/*
+ * Model to hold / reference data related with Rental Agreements in a consistant way.
+ */
 public class RentalAgreement {
 
     private double preDiscountCharge;
@@ -42,6 +45,9 @@ public class RentalAgreement {
         this.checkoutDate = checkoutDate;
     }
 
+    /*
+     * Method to product a rental agreement object give a cart, order ,and pass-through orderservice handle.
+     */
     public static RentalAgreement produceFromCart(Cart cart, Order order, OrderService orderService) {
         RentalAgreement ra = new RentalAgreement();
         ra.setOrderId(order.getId());
