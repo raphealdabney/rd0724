@@ -27,13 +27,18 @@ function App() {
    const [total,setTotal] = useState(0);
    const [receiptHTML, setReceiptHTML] = useState('');
    const [discountPercentage, setDiscountPercentage] = useState(0);
-   const [checkoutDate, setCheckoutDate] = useState(0);
+   const [checkoutDate, setCheckoutDate] = useState(new Date());
 
 
    useEffect(()=>{
       initDatabase();
       soundRef.current = new Audio();
+      setCheckoutDate(formatDate(new Date()));
    },[]);
+
+   useEffect(()=>{
+      updateChange();
+   },[checkoutDate, total, discountPercentage, cash,cart]);
 
    const loadDatabase = async () => {
      let databaseObject = await window.idb.openDB("tailwind_store", 1, {
@@ -64,6 +69,13 @@ function App() {
          await dbRef.current.databaseObject.put("products", product.id, product),
        deleteProduct: async (product) => await dbRef.current.databaseObject.delete("products", product.id),
      };
+   }
+
+   const formatDate = (date)=>{
+    let y = date.getFullYear();
+    let m = date.getMonth()+1;
+    let d = date.getDate();
+     return y + "-" + (m < 10 ? '0'+ m : m)  + "-" + (d < 10 ? '0'+ d : d)
    }
 
    const initDatabase = async () => {
@@ -298,7 +310,7 @@ function App() {
 
    const formatCartRequest = () => {
     return {
-      discountPercentage,
+      discountPercent: discountPercentage,
       checkoutDate,
       items: cart.map(itm=>{
         let product = products.find(p=>p.id == itm.productId);

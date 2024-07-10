@@ -15,6 +15,12 @@ public class OrderItem {
         this.discount_pertcentage = discount_percentage;
         this.shop_order_id = shop_order_id;    
     }
+    public OrderItem(String tool_code, Integer rental_day_count, Integer discount_percentage, Integer shop_order_id) {
+        this.tool_code = tool_code;
+        this.rental_day_count = rental_day_count;
+        this.discount_pertcentage = discount_percentage;
+        this.shop_order_id = shop_order_id;    
+    }
 
     public OrderItem() {
     }

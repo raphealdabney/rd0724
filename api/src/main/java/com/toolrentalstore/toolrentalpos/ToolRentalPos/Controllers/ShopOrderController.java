@@ -1,7 +1,10 @@
 package com.toolrentalstore.toolrentalpos.ToolRentalPos.Controllers;
 
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Cart;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.CartItem;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Order;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.OrderItem;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderItemRepository;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderRepository;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Services.OrderService;
 
@@ -22,10 +25,13 @@ public class ShopOrderController implements BaseController {
     private final OrderRepository repository;
     @Autowired
     private final OrderService orderService;
+    @Autowired
+    private final OrderItemRepository orderItemRepository;
 
-    public ShopOrderController(OrderRepository repository, OrderService orderService) {
+    public ShopOrderController(OrderRepository repository, OrderService orderService, OrderItemRepository orderItemRepository) {
         this.repository = repository;
         this.orderService = orderService;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @GetMapping("/orders")
@@ -47,9 +53,11 @@ public class ShopOrderController implements BaseController {
     @PostMapping(value = "/orders")
     @ResponseBody
     public Map<String, String> createOne(@RequestBody Cart cart) {
+        
         try {
+            String output = orderService.processOrder(cart);
             Map<String, String> response = new HashMap<String,String>();
-            response.put("html","<h1>Data returned</h1>");
+            response.put("html", output);
             return response;
         } catch(Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Resource not created");

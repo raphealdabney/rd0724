@@ -3,18 +3,26 @@ package com.toolrentalstore.toolrentalpos.ToolRentalPos.Models;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "shop_order")
 public class Order {
-    public Order(Integer id, Date date, String token) {
+    public Order(int id, Date date2) {
         this.id = id;
-        this.date = date;
-        this.token = token;
+        this.date = date2;
     }
 
     public Order() {
 
+    }
+
+    public Order(java.util.Date checkoutDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(checkoutDate);
+        this.date = Date.valueOf(LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)));
     }
 
     public Integer getId() {
@@ -33,13 +41,6 @@ public class Order {
         this.date = date;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +50,5 @@ public class Order {
     @Column(name = "date")
     private Date date;
 
-    @Column(name = "token")
-    private String token;
 
 }

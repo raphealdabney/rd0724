@@ -1,18 +1,26 @@
 package com.toolrentalstore.toolrentalpos.ToolRentalPos.Services;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Cart;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.CartItem;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Order;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.OrderItem;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.Product;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Models.RentalAgreement;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderItemRepository;
+import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.OrderRepository;
 import com.toolrentalstore.toolrentalpos.ToolRentalPos.Repositories.ProductRepository;
 
 @Service
@@ -20,10 +28,16 @@ public class OrderService {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
-    public OrderService(ProductRepository productRepository) {
+    public OrderService(ProductRepository productRepository, OrderItemRepository orderItemRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     public List<Map<String,Integer>> getHolidaysForYear(int year) {
@@ -79,13 +93,17 @@ public class OrderService {
 
     public double calculateTotalForCart(Cart cart) {
         double rentalFees = calculateRentalFeesForCart(cart);
-        double discountAmount = rentalFees * cart.getDiscountPercent();
+        double discountAmount = rentalFees * (double) (cart.getDiscountPercent() / 100.0f);
+        System.out.println("--");
+        System.out.println("Discount Percentage: " + String.valueOf(cart.getDiscountPercent()));
+        System.out.println("Discount Amount: " + String.valueOf(discountAmount));
+        System.out.println("Rental Fees: " + String.valueOf(rentalFees));
         return rentalFees - discountAmount;
     }
 
     public float calculateDiscountAmountForCart(Cart cart) {
         double rentalFees = calculateRentalFeesForCart(cart);
-        double discountAmount = rentalFees * cart.getDiscountPercent();
+        double discountAmount = rentalFees * (double) (cart.getDiscountPercent() / 100.0f);
         return Math.round(discountAmount * 100) / 100;
     }
 
@@ -101,6 +119,137 @@ public class OrderService {
        }
 
         return dailyChargesAggregate;
+    }
+
+    public List<String> validateCart(Cart cart) {
+        List<String> output = new ArrayList<>();
+        List<String> running = new ArrayList<>();
+        for (CartItem item : cart.getItems()) {
+            // Rental days error.
+            if (item.getRentalDays() < 1) {
+                running.add("Product with Tool Code: " + item.getToolCode() + ", must be reserved for a minimum of 1 day.");
+            }
+
+            // Discount error.
+            if (cart.getDiscountPercent() < 0  || cart.getDiscountPercent() > 100) {
+                running.add("Your discount must be between 0 and 100%.");
+            }
+        }
+        if (!running.isEmpty()) {
+            output.add("Sorry, there has been an error.");
+            output.addAll(running);
+            running.clear();
+        }
+        return output;
+    }
+
+    public String processOrder(Cart cart) throws Exception {
+        String output = "";
+
+        // Validate Order.
+        List<String> errors = validateCart(cart);
+        if (!errors.isEmpty()) {
+            String errs = "";
+            for (String error : errors) {
+                errs.concat(error+"\n");
+            }
+            throw new Exception(errs);
+        }
+
+        // Create Order from cart.
+        Order order = orderRepository.save(new Order(cart.getCheckoutDate()));
+        System.out.println("--");
+        System.out.println("Order Created with id " + order.getId());
+
+        // Create Order Items.
+        for (CartItem item : cart.getItems()) {
+            OrderItem oItem = orderItemRepository.save(new OrderItem(item.getToolCode(), item.getRentalDays(), cart.getDiscountPercent(), order.getId()));
+            System.out.println("Order Item created for tool: " + oItem.getTool_code());
+        }
+
+        // Produce rental output.
+        RentalAgreement rentalAgreement = RentalAgreement.produceFromCart(cart, order, this);
+
+        // Generate command output.
+        outputRentalAgreementToSys(rentalAgreement);
+
+        // Generate HTML output.
+        output = createRentalAgreementHTML(rentalAgreement, cart);
+        return output;
+    }
+
+
+    public void outputRentalAgreementToSys(RentalAgreement rentalAgreement) {
+        System.out.println("-- Order #" + rentalAgreement.getOrderId() +  " Processed --");
+        System.out.println("Tool Code: " + rentalAgreement.getToolCode());
+        System.out.println("Tool Type: " + rentalAgreement.getToolType()); // ● Tool type - From tool info
+        System.out.println("Tool brand: " + rentalAgreement.getToolBrand()); // ●  From tool info
+        System.out.println("Rental days: " + rentalAgreement.getRentalDays()); // ●  Specified at checkout
+        System.out.println("Check out date: " + formatDate(rentalAgreement.getCheckoutDate())); // ●  - Specified at checkout
+        System.out.println("Due date: " + formatDate(rentalAgreement.getDueDate())); // ●  Calculated from checkout date and rental days.
+        System.out.println("Daily rental char: " + formatCurrency(rentalAgreement.getDailyCharge())); // ●  - Amount per day, specified by the tool type.
+        System.out.println("Charge days: " + rentalAgreement.getChargeDays()); // ●  Count of chargeable days, from day after checkout through and including due
+        System.out.println("Pre-discount Charge : " + formatCurrency(rentalAgreement.getPreDiscountCharge())); // ● Pre-discount charge - Calculated as charge days X daily charge. Resulting total rounded half up
+        System.out.println("Discount Percent: " + rentalAgreement.getDiscountPercent() + "%"); // ● Discount percent - Specified at checkout.
+        System.out.println("Discount Amount: " + formatCurrency(rentalAgreement.getDiscountAmount())); // ● Discount amount - calculated from discount % and pre-discount charge. Resulting amount
+        System.out.println("Final Charge: " + formatCurrency(rentalAgreement.getFinalCharge())); // ● Final charge - Calculated as pre-discount charge - discount amount.
+    }
+
+    public String createRentalAgreementHTML(RentalAgreement rentalAgreement, Cart cart) {
+        String output = "<div class=\"text-center\">\n" + //
+                        "          <img src=\"assets/img/receipt-logo.png\" alt=\"Tool Rental POS\" class=\"mb-3 w-8 h-8 inline-block\">\n" + //
+                        "          <h2 class=\"text-xl font-semibold\">Rental Agreement</h2>\n" + //
+                        "          <p>Tool Rental Store</p>\n" + //
+                        "        </div>\n" + //
+                        "        <div class=\"flex mt-4 text-xs\">\n" + //
+                        "          <div class=\"flex-grow\">No: <span x-text=\"receiptNo\">" + rentalAgreement.getOrderId() + "</span></div>\n" + //
+                        "          <div x-text=\"receiptDate\">" + formatDate(rentalAgreement.getCheckoutDate()) + "</div>\n" + //
+                        "        </div>\n" + //
+                        "        <hr class=\"my-2\">\n" + //
+                        "        <div>\n" + //
+                        "          <table class=\"w-full text-xs\">\n" + //
+                        "            <thead>\n" + //
+                        "             <tr>\n" + //
+                        "                <th class=\"py-1 w-1/12 text-center\">#</th>\n" + //
+                        "                <th class=\"py-1 text-left\">Item</th>\n" + //
+                        "                <th class=\"py-1 w-2/12 text-center\">Qty</th>\n" + //
+                        "                <th class=\"py-1 w-3/12 text-right\">Subtotal</th>\n" + //
+                        "             </tr>\n" + //
+                        "            </thead>\n" + //
+                        "            <tbody>\n";
+
+                        // Loop items.
+                        for (CartItem item : cart.getItems()) {
+                            Product prod = findProductByCode(item.getToolCode());
+                            int chargeDays = getChargableDaysForProductForDaysStarting(prod, item.getRentalDays(), cart.getCheckoutDate());
+                            output = output.concat("                <tr>\n" + //
+                            "                  <td class=\"py-2 text-center\" x-text=\"index+1\">" + item.getToolCode() + "</td>\n" + //
+                            "                  <td class=\"py-2 text-left\">\n" + //
+                            "                    <span x-text=\"item.name\">" + prod.getName() + "</span>\n" + //
+                            "                    <br/>\n" + //
+                            "                    <small x-text=\"priceFormat(item.price)\">" + prod.getCharges_daily()  + " / day</small>\n" + //
+                            "                  </td>\n" + //
+                            "                  <td class=\"py-2 text-center\" x-text=\"item.qty\">" + chargeDays + "</td>\n" + //
+                            "                  <td class=\"py-2 text-right\" x-text=\"priceFormat(item.qty * item.price)\">" + (chargeDays*prod.getCharges_daily()) + "</td>\n" + //
+                            "                </tr>\n"
+                            );
+                        }
+
+
+                        output = output.concat("            </tbody>\n" + //
+                        "          </table>\n" + //
+                        "        </div>\n" + //
+                        "        <hr class=\"my-2\">\n" + //
+                        "        <div>\n" + //
+                        "          <div class=\"flex font-semibold\">\n" + //
+                        "            <div class=\"flex-grow\">TOTAL</div>\n" + //
+                        "            <div>" + formatCurrency(rentalAgreement.getFinalCharge()) + "</div>\n" + //
+                        "          </div>\n" + //
+                        "          <hr class=\"my-2\">\n" + //
+                        "        </div>");
+
+
+        return output;
     }
 
     public int getChargableDaysForProductForDaysStarting(Product product, int daysToRent, Date checkoutDate) {
@@ -154,5 +303,26 @@ public class OrderService {
             }
        }
        return null;
+    }
+
+    // Format Date according to this format :  Date mm/dd/yy
+    public String formatDate(Date date) {
+        String output = "";        
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yy");
+        output = simpleDateFormat.format(date);
+        return output;
+    }
+
+    // Format currency according to this format :  $9,999.99
+    public String formatCurrency(double amount) {
+        String output = "";
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        output = formatter.format(amount);
+        return output;
+    }
+
+    public String formatStrList(Stream<String> stringList) {
+        String output = stringList.reduce("", (codes, item) -> codes + (codes.length() > 0 ? ", " : "") + item);
+        return output;
     }
 }
