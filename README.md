@@ -23,9 +23,11 @@
 6. @todo: Use checkout button to clear the order / cart completely.
 
 ## API
-1. All the calls are defined in the api/openapi3_0.yaml file.
-2. Use a smart IDE like intellij or online tool like swagger to view it in a human readable fashion.
-   3. https://editor.swagger.io/
+POST /orders/
+Responsible for persisting the order in database and validating the cart contents. In addition,  this call will return a HTML receipt for use in frontend application.
+
+POST /calc-cart-price
+Responsible for taking the cart contents, and providing a final cost applying all discounts and taking into account product daily charges.
 
 
 ## Testing
