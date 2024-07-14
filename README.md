@@ -34,3 +34,15 @@ Responsible for taking the cart contents, and providing a final cost applying al
 1. To test easily, open the project in Intelli J
 2. All Test are located at api/src/test/.....
 3. Run them to check for success. ( these also run during compilation)
+
+
+## Video
+There is a video available to walk through my solution. It is for non - technical people in the interview process especially, but also for the technical reviewers as well to understand what I was going for and where to find things.
+
+Technical Folks: If you only want the hard core essiential part of the challenge, Start at 11 minutes.
+
+Non Tecnical Folks: If you absolutely do not want too many technical details stop at 11 minutes.
+
+All are encourged to watch the whole thing. It's a really good way to get a feel for my approach to certain things.
+
+https://drive.google.com/file/d/1qv0U_xDH7toGGi1p9_KHBlcc2vh0DELe/view?usp=drive_link
